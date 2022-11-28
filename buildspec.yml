@@ -8,7 +8,7 @@ phases:
       - echo Logging in to Amazon ECR...
       - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - IMAGE_TAG=$${COMMIT_HASH:=latest}
+      - IMAGE_TAG=$COMMIT_HASH
       - echo $COMMIT_HASH
       - echo $IMAGE_TAG
   build:
