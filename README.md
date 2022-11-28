@@ -1,42 +1,40 @@
+# Sarwa Go Test Server (DevOps Assessment)
 
-# Sarwa DevOps Assignment
+This repository is dedicated to the Test Go server used for Sarwa DevOps assignment.
 
-## Task
+## Prerequisites
 
-Imagine you are working in a team that is developing a service that exposes an API. You can find the source code of the API under the `src/` directory. It simply returns `Success!` on path `/`.
+- [Docker](https://docs.docker.com/get-docker/)
 
-The goal is to deploy the application to a production-like environment with the required automation in place.
+## Repository Structure
 
-You have the following tasks for this iteration:
+This repository contains the simple Go server that returns `Success!` on path `/`, and structured as follows.
 
-- Containerize the simple Go application provided in this repository.
-- Deploy the container to **Amazon Web Services** and **ECS**.
-- Use **Terraform** to create the infrastructure.
-- Automate deployment by using the **CI/CD** tool of your choice (you can use CodePipeline for simplicity).
-- Justify your architectural choices and what tasks you would add to the backlog for the next iteration.
+- `src/`: contains the source code for the server developed in `Go` language.
+- `Dockerfile`: contains the declarative definition for building docker images for both dev and production.
+- `buildspec.yml`: AWS code build pipeline definition.
 
-Tips:
+## Running in Docker Locally
 
-- You are not expected to modify the source code.
-- You should research how to build and run a Go application (with its dependencies) if you don't know how.
-- Try to deliver as much as you can in a reasonable amount of time. Submit even if incomplete or partially working.
-- Let us know if you need more information.
+This Docker image has been built in a multi-stage style, where
 
-Submission:
+- `build`: the first stage using the full featured go docker image, which will be a larger image size.
+- `prod`: the second stage copy only the executable file into an alpine version which will result into a much smaller size.
 
-- Upload all the project code to a public git reposityory on GitHub, and send us its URL via Email.
-- Deliverables:
-  - Source code intact
-  - Dockerfile
-  - Terraform configuration
-  - CI/CD code
-  - README.md containing explanation on how to run/operate what you built, your architecture and its justification, and tasks to add to the backlog.
+You can build and run the docker file on your local machine as follows
 
-## Evaluation
+- Build the Docker Image
+  - Development `docker build . --target build -t sarwa-dev`
+  - Production `docker build . --target prod -t sarwa-prod`
+- Run the docker image locally
+  - `docker run -dp 8001:8000 sarwa-dev`
 
-Your work will be evaluated according to the following criteria.
+## Shipping into Production 
 
-- Skill with Docker, AWS, Terraform, and CI/CD
-- Research skills
-- Architectural skills
-- Communication and writing skills
+A CI/CD pipeline has been setup with this repo, where every merge into the main branch will trigger the pipeline all the way to the production environment.
+
+### Building the project 
+
+The CI part is created using the `buildspec.yml` file and basically building the docker image, pushing the docker image and finally creating a new version of the task definition.
+
+All the other pipeline implementation details can be found in the main [sarwa-infra](https://github.com/tariq-shatat/sarwa-infra) repo.
